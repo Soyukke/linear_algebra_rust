@@ -44,6 +44,15 @@ impl<T: Default + Copy, const ROWS: usize, const COLS: usize> Matrix<T, ROWS, CO
             data: [[T::default(); COLS]; ROWS],
         }
     }
+
+    fn nrow(&self) -> usize {
+        ROWS
+    }
+
+    fn ncol(&self) -> usize {
+        COLS 
+    }
+
 }
 
 impl<T: Add<Output = T> + Default + Copy, const ROWS: usize, const COLS: usize> Index<usize> for Matrix<T, ROWS, COLS> {
@@ -127,6 +136,8 @@ fn main() {
     println!("Hello, world!");
     println!("m: {:?}", m);
     println!("m2: {:?}", m2);
+    println!("m2.nrow: {:?}", m2.nrow());
+    println!("m2.nrow: {:?}", m2.ncol());
     println!("m2[0]: {:?}", m2[0]);
     println!("m2[0][0]: {:?}", m2[0][0]);
     println!("m + m2: {:?}", m.clone() + m2.clone());
