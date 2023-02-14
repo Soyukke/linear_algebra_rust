@@ -77,7 +77,7 @@ impl<T: Add<Output = T> + Default + Copy, const ROWS: usize, const COLS: usize> 
 }
 
 // Tはmulできて、addAssignできて、コピーできて、デフォルトがあるtype
-impl<T: Mul<Output = T> + AddAssign + Default + Copy, const ROWS: usize, const COLS: usize> Mul for Matrix<T, ROWS, COLS> {
+impl<T: Mul<Output = T> + AddAssign + Default + Copy, const ROWS: usize, const COLS: usize> Mul<Matrix<T, ROWS, COLS>> for Matrix<T, ROWS, COLS> {
     type Output = Self;
 
     fn mul(self, other: Self) -> Self {
@@ -97,12 +97,33 @@ impl<T: Mul<Output = T> + AddAssign + Default + Copy, const ROWS: usize, const C
     }
 }
 
+impl<T: Mul<Output = T> + AddAssign + Default + Copy, const ROWS: usize, const COLS: usize> Mul<Vector<T, COLS>> for Matrix<T, ROWS, COLS> {
+    type Output = Vector<T, ROWS>;
+    fn mul(self, other: Vector<T, COLS>) -> Vector<T, ROWS> {
+        // (ROWS, COLS) * (COLS, 1) = (ROWS, 1)
+        let mut result = Vector::<T, ROWS>::new();
+
+        for i in 0..ROWS {
+            let mut x = T::default();
+            for j in 0..COLS {
+                x += self.data[i][j] * other.data[j]
+            }
+            result.data[i] = x;
+        }
+        result
+    }
+}
+
+
+
 
 fn main() {
     let mut m = Matrix::<i32, 4, 4>::new();
     m.data[0][0] = 4_i32;
     let mut m2 = m.clone();
     m2.data[0][3] = 3_i32;
+    m2.data[2][2] = 1_i32;
+    m2.data[3][3] = 1_i32;
     println!("Hello, world!");
     println!("m: {:?}", m);
     println!("m2: {:?}", m2);
@@ -113,11 +134,12 @@ fn main() {
 
 
     let mut v = Vector::<i32, 4>::new();
-    let mut v2 = Vector::from_vec([0.0, 1.0, 20.0]);
+    let mut v2 = Vector::from_vec([0, 1, 200, 2]);
     v[0] = 3;
     v[1] = 3;
     v[2] = 2;
     println!("v: {:?}", v);
     println!("v[0]: {:?}", v[0]);
     println!("v[0]: {:?}", v2[0]);
+    println!("m2 * v2: {:?}", m2 * v2);
 }
