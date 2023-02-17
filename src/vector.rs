@@ -1,13 +1,18 @@
+use std::ops::{Add, Mul, AddAssign, Index, IndexMut};
 #[derive(Debug, Clone)]
-struct Vector<T, const ROWS: usize> {
-    data: [T; ROWS],
+pub struct Vector<T, const ROWS: usize> {
+    pub data: [T; ROWS],
 }
 
 impl<T: Default + Copy, const ROWS: usize> Vector<T, ROWS> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             data: [T::default(); ROWS],
         }
+    }
+
+    pub fn from_vec(v: [T; ROWS]) -> Self {
+        Self {data: v}
     }
 }
 
@@ -24,5 +29,3 @@ impl<T: Add<Output = T> + Default + Copy, const ROWS: usize> IndexMut<usize> for
         &mut self.data[index]
     }
 }
-
-
