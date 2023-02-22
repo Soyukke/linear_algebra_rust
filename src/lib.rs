@@ -1,6 +1,7 @@
 pub mod complex;
 pub mod vector;
 pub mod matrix;
+pub mod basic_trait;
 
 #[cfg(test)]
 mod tests {

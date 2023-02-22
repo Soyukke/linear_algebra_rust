@@ -1,4 +1,5 @@
 use std::ops::{Add, Sub, Mul, AddAssign, Neg};
+use crate::basic_trait::One;
 
 /**
  * Complex<T>を定義する。
@@ -12,9 +13,21 @@ pub struct Complex<T> {
     pub imag: T,
 }
 
-impl<T: Copy> Complex<T> {
+impl<T: Copy+One+Default> Complex<T> {
     pub fn new(real:T, imag:T) -> Self {
         Self { real: real, imag: imag  }
+    }
+
+    // 虚数
+    fn i() -> Self {
+        Self {real: T::default(), imag: T::one()}
+    }
+
+}
+
+impl<T: Default + One> One for Complex<T> {
+    fn one() -> Self {
+        Self {real: T::one(), imag: T::default()}
     }
 }
 
