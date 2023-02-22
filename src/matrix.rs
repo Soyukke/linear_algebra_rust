@@ -1,6 +1,7 @@
 use std::ops::{Add, Mul, AddAssign, Index, IndexMut};
 // クレート内のモジュールへのアクセスはcrate::で行う。
 use crate::vector::{*};
+use crate::basic_trait::{One};
 
 #[derive(Debug, Clone)]
 pub struct Matrix<T, const ROWS: usize, const COLS: usize> {
@@ -21,8 +22,20 @@ impl<T: Default + Copy, const ROWS: usize, const COLS: usize> Matrix<T, ROWS, CO
     pub fn ncol(&self) -> usize {
         COLS 
     }
-
 }
+
+impl<T: Add<Output = T> + Default + One + Copy, const ROWS: usize, const COLS: usize> One for Matrix<T, ROWS, COLS> {
+    fn one() -> Self {
+        let mut data = [[T::default(); COLS]; ROWS];
+        let minvalue = if ROWS < COLS {ROWS} else {COLS};
+        for i in 0..minvalue {
+                data[i][i] = T::one();
+        }
+        Self {data}
+    }
+}
+
+
 
 impl<T: Add<Output = T> + Default + Copy, const ROWS: usize, const COLS: usize> Index<usize> for Matrix<T, ROWS, COLS> {
     type Output = [T; COLS];
