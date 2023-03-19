@@ -2,6 +2,9 @@ pub mod complex;
 pub mod vector;
 pub mod matrix;
 pub mod basic_trait;
+pub mod cuda_ffi;
+pub mod cublas_ffi;
+pub mod gpu;
 
 #[cfg(test)]
 mod tests {

@@ -1,7 +1,8 @@
-use linear_algebra::complex::{*};
-use linear_algebra::matrix::{*};
-use linear_algebra::vector::{*};
+use linear_algebra::complex::*;
+use linear_algebra::matrix::*;
+use linear_algebra::vector::*;
 
+#[cfg(not(feature="cuda"))]
 fn main() {
     let mut m = Matrix::<i32, 4, 4>::new();
     m.data[0][0] = 4_i32;
@@ -19,7 +20,6 @@ fn main() {
     println!("m2[0][0]: {:?}", m2[0][0]);
     println!("m + m2: {:?}", m.clone() + m2.clone());
     println!("m * m2: {:?}", m.clone() * m2.clone());
-
 
     let mut v = Vector::<i32, 4>::new();
     let mut v2 = Vector::from_vec([0, 1, 200, 2]);
@@ -44,4 +44,17 @@ fn main() {
     println!("complex 4 * c1 : {:?}", 4 * c1);
     println!("complex conjugate c1 : {:?}", c1.conj());
     println!("complex conjugate c3 : {:?}", c3.conj());
+}
+
+#[cfg(feature="cuda")]
+fn main() {
+    println!("hoge");
+    use linear_algebra::gpu::*;
+    use linear_algebra::cublas_ffi::*;
+
+    //unsafe {
+    //    hoge();
+    //}
+
+    cumatrix_test();
 }

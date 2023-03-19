@@ -1,6 +1,6 @@
 use std::ops::{Add, Mul, AddAssign, Index, IndexMut};
 // クレート内のモジュールへのアクセスはcrate::で行う。
-use crate::vector::{*};
+use crate::vector::*;
 use crate::basic_trait::{One};
 
 #[derive(Debug, Clone)]
@@ -105,6 +105,23 @@ impl<T: Mul<Output = T> + AddAssign + Default + Copy, const ROWS: usize, const C
         result
     }
 }
+
+impl<T: Mul<Output = T> + AddAssign + Default + Copy, const ROWS: usize, const COLS: usize> Mul<T> for Matrix<T, ROWS, COLS> {
+    type Output = Self;
+    fn mul(self, other: T) -> Matrix<T, ROWS, COLS> {
+        // (ROWS, COLS) * (COLS, 1) = (ROWS, 1)
+        let mut result = Matrix::<T, ROWS, COLS>::new();
+
+        for i in 0..ROWS {
+            let mut x = T::default();
+            for j in 0..COLS {
+                result.data[i][j] = self.data[i][j] * other;
+            }
+        }
+        result
+    }
+}
+
 
 
 use std::fmt;
