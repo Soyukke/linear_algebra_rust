@@ -1,11 +1,21 @@
 use std::ops::{Add, Mul, AddAssign, Index, IndexMut};
 // クレート内のモジュールへのアクセスはcrate::で行う。
 use crate::vector::*;
-use crate::basic_trait::{One};
+use crate::basic_trait::{One, Transpose};
+
+use rand::Rng;
+use rand::distributions::{Distribution, Standard};
 
 #[derive(Debug, Clone)]
 pub struct Matrix<T, const ROWS: usize, const COLS: usize> {
     pub data: [[T; COLS]; ROWS],
+}
+
+impl<T: Default + Copy, const ROWS: usize, const COLS: usize> Default for Matrix<T, ROWS, COLS> {
+    fn default() -> Self {
+        let data = [[T::default(); COLS]; ROWS];
+        Matrix {data}
+    }
 }
 
 impl<T: Default + Copy, const ROWS: usize, const COLS: usize> Matrix<T, ROWS, COLS> {
@@ -113,7 +123,6 @@ impl<T: Mul<Output = T> + AddAssign + Default + Copy, const ROWS: usize, const C
         let mut result = Matrix::<T, ROWS, COLS>::new();
 
         for i in 0..ROWS {
-            let mut x = T::default();
             for j in 0..COLS {
                 result.data[i][j] = self.data[i][j] * other;
             }
@@ -122,6 +131,34 @@ impl<T: Mul<Output = T> + AddAssign + Default + Copy, const ROWS: usize, const C
     }
 }
 
+/// random matrix
+impl<T: Default + Copy, const ROWS: usize, const COLS: usize> Distribution<Matrix<T, ROWS, COLS>> for Standard
+where Standard: Distribution<T>
+{
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Matrix<T, ROWS, COLS> {
+        let mut result = Matrix::<T, ROWS, COLS>::default();
+        for i in 0..ROWS {
+            for j in 0..COLS {
+                let x: T = rng.gen();
+                result.data[i][j] = x;
+            }
+        }
+        result
+    }
+}
+
+impl<T: Default + Copy, const ROWS: usize, const COLS: usize> Transpose for Matrix<T, ROWS, COLS> {
+    type Output = Matrix<T, COLS, ROWS>;
+    fn transpose(self) -> Self::Output {
+        let mut result = Matrix::<T, COLS, ROWS>::default();
+        for i in 0..ROWS {
+            for j in 0..COLS {
+                result.data[j][i] = self.data[i][j];
+            }
+        }
+        result
+    }
+}
 
 
 use std::fmt;
@@ -138,3 +175,4 @@ impl<T: fmt::Display, const ROWS: usize, const COLS: usize> fmt::Display for Mat
         write!(f, "{}", s)
     }
 }
+

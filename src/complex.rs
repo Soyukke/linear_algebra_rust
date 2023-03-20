@@ -1,5 +1,7 @@
 use std::ops::{Add, Sub, Mul, AddAssign, Neg};
 use crate::basic_trait::One;
+use rand::Rng;
+use rand::distributions::{Distribution, Standard};
 
 /**
  * Complex<T>を定義する。
@@ -37,6 +39,7 @@ impl<T: Default> Default for Complex<T> {
     }
 }
 
+/// # 複素共役
 pub trait Conj{
     type Output;
     fn conj(&self) -> Self::Output;
@@ -107,3 +110,13 @@ impl Mul<Complex<f64>> for f64
         Complex {real: rhs.real*self, imag: rhs.imag*self}
     }
 }
+
+impl<T: Default + Copy> Distribution<Complex<T>> for Standard
+where Standard: Distribution<T>
+{
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Complex<T> {
+        let (real, imag) = rng.gen::<(T, T)>();
+        Complex { real, imag }
+    }
+}
+

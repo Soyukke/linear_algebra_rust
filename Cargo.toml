@@ -9,8 +9,12 @@ edition = "2021"
 cuda = ["cublas-sys", "cuda-runtime-sys"]
 
 [dependencies]
+rand = "0.8.5"
 #cublas = { version = "0.2.0", optional =true }
 #cuda-sys = { version = "0.2.0", optional =true }
 #cuda-driver-sys = { version = "0.3.0", optional =true }
 cuda-runtime-sys = {version="0.3.0-alpha.1", optional=true}
 cublas-sys = { version = "0.1.0", optional =true }
+blas-sys = "0.7.1"
+openblas-src = "0.10.8"
+#lapack-src = "0.8.0"

@@ -5,9 +5,16 @@ use std::{
     ptr,
 };
 use crate::matrix::{Matrix};
+use crate::vmatrix::VMatrix;
 use crate::basic_trait::{One};
 use std::mem::size_of;
 use std::ops::{Add, Mul, AddAssign, Index, IndexMut};
+
+#[derive(Debug, Clone)]
+pub enum CuVMatrixError {
+    UndefinedError(String),
+}
+
 
 pub struct CublasHandle {
     pub handle: cublasHandle_t,
@@ -61,6 +68,14 @@ struct CuMatrix<const ROWS: usize, const COLS: usize> {
     pub data_ptr: *mut f32
 }
 
+#[derive(Debug)]
+struct CuVMatrix {
+    rows: usize,
+    cols: usize,
+    pub data_ptr: *mut f32
+}
+
+
 //impl CuMatrix<const ROWS: usize, const COLS: usize> {
 //    fn cpu(&self) {
 //
@@ -104,8 +119,58 @@ impl<const ROWS: usize, const COLS: usize> Mul<CuMatrix<ROWS, COLS>> for CuMatri
     }
 }
 
+impl Mul<CuVMatrix> for CuVMatrix {
+    type Output = Result<Self, CuVMatrixError>;
+
+    fn mul(self, other: Self) -> Self::Output {
+        if self.cols != other.rows {
+            return Err(VMatrixError::UndefinedError("matrix size does not match.".to_string()));
+        }
+
+        let handle = CublasHandle::new().unwrap();
+        let mut mat = CuVMatrix::<f32>::new(self.row, other.cols);
+        let mut result = mat.gpu();
+
+        let n = self.rows*size_of::<c_float>();
+        let k = self.cols*size_of::<c_float>();
+        let m = other.cols*size_of::<c_float>();
+
+        let alpha: c_float= 1.0;
+        let beta: c_float= 0.0;
+
+        let status = 
+        unsafe {
+            cublasSgemm_v2(
+                handle.handle,
+                cublasOperation_t::CUBLAS_OP_N,
+                cublasOperation_t::CUBLAS_OP_N,
+                n as i32,
+                k as i32,
+                m as i32,
+                &alpha,
+                self.data_ptr,
+                n as i32,
+                other.data_ptr,
+                k as i32,
+                &beta,
+                result.data_ptr,
+                m as i32,
+            );
+        };
+
+        free(self.data_ptr).unwrap();
+        free(other.data_ptr).unwrap();
+        handle.destroy();
+        Ok(result)
+    }
+}
+
 trait GPU<const ROWS: usize, const COLS: usize> {
     fn gpu(&self) -> CuMatrix< ROWS, COLS>;
+}
+
+trait GPU {
+    fn gpu(&self) -> CuVMatrix;
 }
 
 impl<const ROWS: usize, const COLS: usize> GPU<ROWS, COLS> for Matrix<f32, ROWS, COLS> 
@@ -117,6 +182,17 @@ impl<const ROWS: usize, const COLS: usize> GPU<ROWS, COLS> for Matrix<f32, ROWS,
         CuMatrix { data_ptr: a_ptr }
     }
 }
+
+impl GPU for VMatrix<f32> 
+{
+    fn gpu(&self) -> CuVMatrix{
+        let n = self.rows*self.cols*size_of::<c_float>();
+        let mut a_ptr: *mut f32 = malloc(n).unwrap();
+        memcpy_to_device(a_ptr, self.data.as_ptr() as *const f32, n).unwrap();
+        CuVMatrix { data_ptr: a_ptr }
+    }
+}
+
 
 pub fn cumatrix_test() {
     println!("cumatrix_test");
