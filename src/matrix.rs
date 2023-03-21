@@ -160,7 +160,6 @@ impl<T: Default + Copy, const ROWS: usize, const COLS: usize> Transpose for Matr
     }
 }
 
-
 use std::fmt;
 // 出力
 impl<T: fmt::Display, const ROWS: usize, const COLS: usize> fmt::Display for Matrix<T, ROWS, COLS> {

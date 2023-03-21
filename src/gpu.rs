@@ -48,9 +48,9 @@ pub unsafe fn hoge() {
     //
     let nnn: usize = 4;
     let nnn_mem = nnn*size_of::<c_float>();
-    let mut a_ptr: *mut f32 = malloc(nnn_mem).unwrap();
-    let mut b_ptr: *mut f32 = malloc(nnn_mem).unwrap();
-    let mut c_ptr: *mut f32 = malloc(nnn_mem).unwrap();
+    let a_ptr: *mut f32 = malloc(nnn_mem).unwrap();
+    let b_ptr: *mut f32 = malloc(nnn_mem).unwrap();
+    let c_ptr: *mut f32 = malloc(nnn_mem).unwrap();
 
     let h_a = vec![3.0f32; nnn];
     let h_b = vec![2.0f32; nnn];

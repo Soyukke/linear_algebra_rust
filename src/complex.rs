@@ -120,3 +120,19 @@ where Standard: Distribution<T>
     }
 }
 
+
+use std::fmt;
+// 出力
+impl<T: fmt::Display + Default + std::cmp::PartialOrd> fmt::Display for Complex<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let sign = if self.imag < T::default() {
+            "-"
+        } else {
+            "+"
+        };
+        let s = format!("{:>5} {} {:>5}i", self.real, sign, self.imag);
+        write!(f, "{}", s)
+    }
+}
+
+

@@ -1,11 +1,5 @@
 use std::{ptr, ffi::{c_float, c_int, c_void, c_char, CString}};
 
-//#[path ="f77blas.rs"]
-//mod f77blas;
-//use f77blas::*;
-//
-//
-
 use crate::{vmatrix::VMatrix, basic_trait::Transpose};
 
 use openblas_src::*;
@@ -29,7 +23,6 @@ pub fn sgemm() {
         let k = b.cols as i32;
 
         let mut c_v = VMatrix::zeros(2, 2);
-        //let mut c = vec![0.0f32; 4];
 
         sgemm_(
             transa,

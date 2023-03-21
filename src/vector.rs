@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul, AddAssign, Index, IndexMut};
+use std::ops::{Add, Index, IndexMut};
 #[derive(Debug, Clone)]
 pub struct Vector<T, const ROWS: usize> {
     pub data: [T; ROWS],
@@ -29,3 +29,5 @@ impl<T: Add<Output = T> + Default + Copy, const ROWS: usize> IndexMut<usize> for
         &mut self.data[index]
     }
 }
+
+

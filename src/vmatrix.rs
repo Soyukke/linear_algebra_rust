@@ -1,31 +1,29 @@
-use std::ops::{Add, Mul, AddAssign, Index, IndexMut};
-use std::error::Error;
+use std::ops::{Mul, AddAssign};
 // クレート内のモジュールへのアクセスはcrate::で行う。
-use crate::vector::*;
 use crate::basic_trait::{One, Transpose};
 
 use rand::Rng;
 use rand::distributions::{Distribution, Standard};
 
 #[derive(Debug, Clone)]
-pub enum VMatrixError {
+pub enum MatrixError {
     UndefinedError(String),
 }
 
 #[derive(Debug, Clone)]
-pub struct VMatrix<T> {
+pub struct Matrix<T> {
     pub rows: usize,
     pub cols: usize,
     //pub data: Vec<Vec<T>>,
     pub data: Vec<T>,
 }
 
-impl<T:Default+Clone> VMatrix<T> {
-    pub fn new(rows: usize, cols: usize, init_val: T) -> VMatrix<T>
+impl<T:Default+Clone> Matrix<T> {
+    pub fn new(rows: usize, cols: usize, init_val: T) -> Matrix<T>
     where
         T: Clone,
     {
-        VMatrix {
+        Matrix {
             rows,
             cols,
             //data: vec![vec![init_val; cols]; rows],
@@ -39,14 +37,14 @@ impl<T:Default+Clone> VMatrix<T> {
 
 }
 
-impl<T:Default+Clone+One> VMatrix<T>
+impl<T:Default+Clone+One> Matrix<T>
 {
     pub fn ones(rows: usize, cols: usize) -> Self {
         Self::new(rows, cols, T::one())
     }
 }
 
-impl<T:Default+Clone> VMatrix<T>
+impl<T:Default+Clone> Matrix<T>
 where Standard: Distribution<T>
 {
     pub fn rand(rows: usize, cols: usize) -> Self {
@@ -64,7 +62,7 @@ where Standard: Distribution<T>
 
 use std::fmt;
 // 出力
-impl<T: fmt::Display> fmt::Display for VMatrix<T> {
+impl<T: fmt::Display> fmt::Display for Matrix<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut s = format!("{}x{} Matrix\n", self.rows, self.cols);
         for i in 0..self.rows{
@@ -81,11 +79,11 @@ impl<T: fmt::Display> fmt::Display for VMatrix<T> {
 /// 行列積
 /// (self.rows, self.cols) * (other.rows, other.cols)
 /// require: self.cols == other.rows
-impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<VMatrix<T>> for VMatrix<T> {
-    type Output = Result<Self, VMatrixError>;
+impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<Matrix<T>> for Matrix<T> {
+    type Output = Result<Self, MatrixError>;
     fn mul(self, other: Self) -> Self::Output {
         if self.cols != other.rows {
-            return Err(VMatrixError::UndefinedError("matrix size does not match.".to_string()));
+            return Err(MatrixError::UndefinedError("matrix size does not match.".to_string()));
         }
         let mut result = Self::zeros(self.rows, other.cols);
         for i in 0..self.rows{
@@ -102,10 +100,10 @@ impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<VMatrix<T>> for VMatri
 }
 
 /// 転置
-impl<T: Default + Copy> Transpose for VMatrix<T> {
-    type Output = VMatrix<T>;
+impl<T: Default + Copy> Transpose for Matrix<T> {
+    type Output = Matrix<T>;
     fn transpose(self) -> Self::Output {
-        let mut result = VMatrix::<T>::zeros(self.cols, self.rows);
+        let mut result = Matrix::<T>::zeros(self.cols, self.rows);
         for i in 0..self.rows{
             for j in 0..self.cols{
                 //result.data[j*self.cols + i] = self.data[i*self.rows + j];
@@ -118,7 +116,7 @@ impl<T: Default + Copy> Transpose for VMatrix<T> {
 
 
 /// Row-Major like Z
-impl<T> std::ops::Index<(usize, usize)> for VMatrix<T> {
+impl<T> std::ops::Index<(usize, usize)> for Matrix<T> {
     type Output = T;
 
     fn index(&self, (row, col): (usize, usize)) -> &Self::Output {
@@ -127,7 +125,7 @@ impl<T> std::ops::Index<(usize, usize)> for VMatrix<T> {
 }
 
 /// Row-Major like Z
-impl<T> std::ops::IndexMut<(usize, usize)> for VMatrix<T> {
+impl<T> std::ops::IndexMut<(usize, usize)> for Matrix<T> {
     fn index_mut(&mut self, (row, col): (usize, usize)) -> &mut Self::Output {
         &mut self.data[row*self.cols+ col]
     }

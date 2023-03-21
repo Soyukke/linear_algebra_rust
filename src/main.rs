@@ -1,9 +1,9 @@
-use linear_algebra::complex::*;
-use linear_algebra::matrix::*;
-use linear_algebra::vector::*;
-
 #[cfg(not(feature="cuda"))]
 fn main() {
+    use linear_algebra::complex::*;
+    use linear_algebra::matrix::*;
+    use linear_algebra::vector::*;
+
     let mut m = Matrix::<i32, 4, 4>::new();
     m.data[0][0] = 4_i32;
     let mut m2 = m.clone();
@@ -49,12 +49,10 @@ fn main() {
 #[cfg(feature="cuda")]
 fn main() {
     println!("hoge");
-    use linear_algebra::gpu::*;
     use linear_algebra::cublas_ffi::*;
 
     //unsafe {
     //    hoge();
     //}
 
-    cumatrix_test();
 }
