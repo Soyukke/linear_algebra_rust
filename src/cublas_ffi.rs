@@ -54,6 +54,15 @@ impl CublasHandle {
     }
 }
 
+pub fn cublasversion() {
+    unsafe {
+        let handle = CublasHandle::new().unwrap();
+        let mut result = 0;
+        cublasGetVersion_v2(handle.handle, &mut result);
+        println!("CUBLAS Version : {}", result);
+    }
+}
+
 #[derive(Debug)]
 pub struct CuMatrix {
     rows: usize,

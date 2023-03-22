@@ -55,4 +55,8 @@ fn main() {
     //    hoge();
     //}
 
+    use linear_algebra::vmatrix::{*};
+    use linear_algebra::cusolver_ffi::*;
+    cusolverDnZheevd_ffi();
+
 }

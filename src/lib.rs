@@ -134,6 +134,7 @@ mod tests {
     fn cublas_sgemm() {
         use crate::vmatrix::{*};
         use crate::cublas_ffi::*;
+        cublasversion();
         let x = Matrix::<f32>::new(3, 3, 2f32);
         let y = Matrix::<f32>::new(3, 3, 3f32);
         println!("cpu::x: {}", x);
@@ -161,4 +162,18 @@ mod tests {
         cusolverDnSgeqrf_ffi();
     }
 
+
+    #[cfg(feature="cuda")]
+    #[test]
+    fn cusolver_00() {
+        use crate::cusolver_ffi::*;
+        cusolverGetVersion_ffi();
+    }
+
+    #[cfg(feature="cuda")]
+    #[test]
+    fn cusolver_99() {
+        use crate::cusolver_ffi::*;
+        sgemm_test();
+    }
 }
