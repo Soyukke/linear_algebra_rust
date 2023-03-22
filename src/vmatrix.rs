@@ -4,6 +4,7 @@ use crate::basic_trait::{One, Transpose};
 
 use rand::Rng;
 use rand::distributions::{Distribution, Standard};
+use crate::complex::Complex;
 
 #[derive(Debug, Clone)]
 pub enum MatrixError {
@@ -43,6 +44,23 @@ impl<T:Default+Clone+One> Matrix<T>
         Self::new(rows, cols, T::one())
     }
 }
+
+impl Matrix<Complex<f32>>
+{
+    pub fn to_vec(&self) -> Vec<f32> {
+        let mut vs: Vec<Vec<f32>> = self.data.iter().map(
+            |a| a.to_vec()
+        ).collect();
+        let vss = vs.iter_mut().reduce(|a, b| {
+                a.extend(b.iter());
+                a
+            }).unwrap();
+        //println!("vs: {:?}", vs);
+        println!("vss: {:?}", vss);
+        vss.to_vec()
+    }
+}
+
 
 impl<T:Default+Clone> Matrix<T>
 where Standard: Distribution<T>

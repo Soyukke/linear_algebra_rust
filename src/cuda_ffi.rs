@@ -27,6 +27,7 @@ pub fn memcpy<T>(dst: *mut T, src: *const T, size: usize, kind: cudaMemcpyKind) 
     if cuda_error == cudaError::cudaSuccess {
         Ok(())
     } else {
+        println!("cuda_error: {:?}", cuda_error);
         Err(CUDAError)
     }
 }

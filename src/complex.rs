@@ -15,16 +15,20 @@ pub struct Complex<T> {
     pub imag: T,
 }
 
+
 impl<T: Copy+One+Default> Complex<T> {
     pub fn new(real:T, imag:T) -> Self {
         Self { real: real, imag: imag  }
     }
 
     // 虚数
-    fn i() -> Self {
+    pub fn i() -> Self {
         Self {real: T::default(), imag: T::one()}
     }
 
+    pub fn to_vec(&self) -> Vec<T> {
+        vec![self.real, self.imag]
+    }
 }
 
 impl<T: Default + One> One for Complex<T> {

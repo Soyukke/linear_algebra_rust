@@ -150,15 +150,15 @@ mod tests {
     fn cusolver_01() {
         use crate::vmatrix::{*};
         use crate::cusolver_ffi::*;
-        let x = Matrix::<f32>::new(3, 3, 2f32);
-        let y = Matrix::<f32>::new(3, 3, 3f32);
-        println!("cpu::x: {}", x);
-        println!("cpu::y: {}", y);
-        //let cx = x.gpu();
-        //let cy = y.gpu();
-        //let cz = cx * cy;
-        //let cpuz = cz.unwrap().cpu();
-        //println!("cpu::z: {}", cpuz);
-        cusolverDnZheevd();
+        cusolverDnZheevd_ffi();
     }
+
+    #[cfg(feature="cuda")]
+    #[test]
+    fn cusolver_02() {
+        use crate::vmatrix::{*};
+        use crate::cusolver_ffi::*;
+        cusolverDnSgeqrf_ffi();
+    }
+
 }

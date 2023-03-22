@@ -57,6 +57,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "bytemuck"
+version = "1.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "17febce684fd15d89027105661fec94afb475cb995fbc59d2865198446ba2eea"
+
+[[package]]
 name = "byteorder"
 version = "1.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -368,6 +374,7 @@ name = "linear_algebra"
 version = "0.1.0"
 dependencies = [
  "blas-sys",
+ "bytemuck",
  "cublas-sys",
  "cuda-runtime-sys",
  "cusolver-sys",
