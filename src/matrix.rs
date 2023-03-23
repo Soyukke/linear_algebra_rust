@@ -87,7 +87,6 @@ impl<T: Mul<Output = T> + AddAssign + Default + Copy, const ROWS: usize, const C
 
         for i in 0..ROWS {
             for j in 0..COLS {
-                //result.data[i][j] = self.data[i][j] * other.data[i][j];
                 let mut x = T::default();
                 for k in 0..ROWS {
                     x += self.data[i][k] * other.data[k][j]

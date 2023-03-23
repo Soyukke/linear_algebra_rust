@@ -5,6 +5,7 @@ use crate::basic_trait::{One, Transpose};
 use rand::Rng;
 use rand::distributions::{Distribution, Standard};
 use crate::complex::Complex;
+use std::cmp::min;
 
 #[derive(Debug, Clone)]
 pub enum MatrixError {
@@ -15,7 +16,6 @@ pub enum MatrixError {
 pub struct Matrix<T> {
     pub rows: usize,
     pub cols: usize,
-    //pub data: Vec<Vec<T>>,
     pub data: Vec<T>,
 }
 
@@ -42,6 +42,14 @@ impl<T:Default+Clone+One> Matrix<T>
 {
     pub fn ones(rows: usize, cols: usize) -> Self {
         Self::new(rows, cols, T::one())
+    }
+
+    pub fn identity(rows: usize, cols: usize) -> Self {
+        let mut result = Self::zeros(rows, cols);
+        for i in 0..min(rows, cols) {
+            result[(i, i)] = T::one();
+        } 
+        result
     }
 }
 
@@ -97,23 +105,44 @@ impl<T: fmt::Display> fmt::Display for Matrix<T> {
 /// 行列積
 /// (self.rows, self.cols) * (other.rows, other.cols)
 /// require: self.cols == other.rows
+//impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<Matrix<T>> for Matrix<T> {
+//    type Output = Result<Self, MatrixError>;
+//    fn mul(self, other: Self) -> Self::Output {
+//        if self.cols != other.rows {
+//            return Err(MatrixError::UndefinedError("matrix size does not match.".to_string()));
+//        }
+//        let mut result = Self::zeros(self.rows, other.cols);
+//        for i in 0..self.rows{
+//            for j in 0..self.cols{
+//                let mut x = T::default();
+//                for k in 0..other.cols{
+//                    x += self[(i, k)] * other[(k, j)]
+//                }
+//                result[(i, j)] = x;
+//            }
+//        }
+//        Ok(result)
+//    }
+//}
+
 impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<Matrix<T>> for Matrix<T> {
-    type Output = Result<Self, MatrixError>;
+    type Output = Self;
     fn mul(self, other: Self) -> Self::Output {
         if self.cols != other.rows {
-            return Err(MatrixError::UndefinedError("matrix size does not match.".to_string()));
+            panic!("matrix size does not match.");
+            //return Err(MatrixError::UndefinedError("matrix size does not match.".to_string()));
         }
         let mut result = Self::zeros(self.rows, other.cols);
         for i in 0..self.rows{
-            for j in 0..self.cols{
+            for j in 0..other.cols{
                 let mut x = T::default();
-                for k in 0..other.cols{
+                for k in 0..other.rows{
                     x += self[(i, k)] * other[(k, j)]
                 }
                 result[(i, j)] = x;
             }
         }
-        Ok(result)
+        result
     }
 }
 
@@ -124,7 +153,6 @@ impl<T: Default + Copy> Transpose for Matrix<T> {
         let mut result = Matrix::<T>::zeros(self.cols, self.rows);
         for i in 0..self.rows{
             for j in 0..self.cols{
-                //result.data[j*self.cols + i] = self.data[i*self.rows + j];
                 result[(j, i)] = self[(i, j)];
             }
         }

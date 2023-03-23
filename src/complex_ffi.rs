@@ -1,23 +1,12 @@
-use std::ops::{Add, Sub, Mul, AddAssign, Neg};
-use crate::basic_trait::One;
-use rand::Rng;
-use rand::distributions::{Distribution, Standard};
-
-/**
- * Complex<T>を定義する。
- * Add, Mul, AddAssign traitなどを実装することで、Matrix演算のトレイト境界を満たすことができ、
- * 複素行列の演算も自然に実装できる。
- */
-
 #[repr(C)]
+#[repr(align(16))]
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Complex<T> {
+pub struct Complexf64 {
     pub real: T,
     pub imag: T,
 }
 
-
-impl<T: Copy+One+Default> Complex<T> {
+impl<T: Copy+One+Default> Complexf64 {
     pub fn new(real:T, imag:T) -> Self {
         Self { real: real, imag: imag  }
     }
@@ -32,13 +21,13 @@ impl<T: Copy+One+Default> Complex<T> {
     }
 }
 
-impl<T: Default + One> One for Complex<T> {
+impl<T: Default + One> One for Complexf64 {
     fn one() -> Self {
         Self {real: T::one(), imag: T::default()}
     }
 }
 
-impl<T: Default> Default for Complex<T> {
+impl<T: Default> Default for Complexf64 {
     fn default() -> Self {
         Self {real: T::default(), imag: T::default()}
     }
@@ -51,22 +40,22 @@ pub trait Conj{
 }
 
 // 複素共役の実装。Tのトレイト境界=制約はCopyとNeg(マイナスの単項演算子)
-impl<T: Copy + Neg<Output=T>> Conj for Complex<T> {
-    type Output = Complex<T>;
-    fn conj(&self) -> Complex<T> {
+impl<T: Copy + Neg<Output=T>> Conj for Complexf64 {
+    type Output = Complexf64;
+    fn conj(&self) -> Complexf64 {
         Complex { real: self.real, imag: -self.imag }
 
     }
 }
 
-impl<T: Add<Output=T>> Add<Complex<T>> for Complex<T> {
-    type Output = Complex<T>;
-    fn add(self, rhs: Complex<T>) -> Self::Output {
+impl<T: Add<Output=T>> Add<Complexf64> for Complexf64 {
+    type Output = Complexf64;
+    fn add(self, rhs: Complexf64) -> Self::Output {
         Complex {real: self.real + rhs.real, imag: self.imag + rhs.imag}
     }
 }
 
-impl<T: AddAssign> AddAssign for Complex<T> {
+impl<T: AddAssign> AddAssign for Complexf64 {
     fn add_assign(&mut self, rhs: Self) {
         self.real += rhs.real;
         self.imag += rhs.imag;
@@ -74,17 +63,17 @@ impl<T: AddAssign> AddAssign for Complex<T> {
 }
 
 // complex<T> * complex<T>
-impl<T: Copy + Add<Output=T> + Sub<Output=T> + Mul<Output=T>> Mul<Complex<T>> for Complex<T> {
-    type Output = Complex<T>;
-    fn mul(self, rhs: Complex<T>) -> Self::Output {
+impl<T: Copy + Add<Output=T> + Sub<Output=T> + Mul<Output=T>> Mul<Complexf64> for Complexf64 {
+    type Output = Complexf64;
+    fn mul(self, rhs: Complexf64) -> Self::Output {
         // (a + bi)(x + yi) = ax + ayi + bxi - by
         Complex {real: self.real*rhs.real - self.imag*rhs.imag, imag: self.real*rhs.imag + self.imag*rhs.real}
     }
 }
 
 // complex<T> * T
-impl<T: Copy + Add<Output=T> + Sub<Output=T> + Mul<Output=T>> Mul<T> for Complex<T> {
-    type Output = Complex<T>;
+impl<T: Copy + Add<Output=T> + Sub<Output=T> + Mul<Output=T>> Mul<T> for Complexf64 {
+    type Output = Complexf64;
     fn mul(self, rhs: T) -> Self::Output {
         // (a + bi)(x + yi) = ax + ayi + bxi - by
         Complex {real: self.real*rhs, imag: self.imag*rhs}
@@ -116,10 +105,10 @@ impl Mul<Complex<f64>> for f64
     }
 }
 
-impl<T: Default + Copy> Distribution<Complex<T>> for Standard
+impl<T: Default + Copy> Distribution<Complexf64> for Standard
 where Standard: Distribution<T>
 {
-    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Complex<T> {
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Complexf64 {
         let (real, imag) = rng.gen::<(T, T)>();
         Complex { real, imag }
     }
@@ -128,7 +117,7 @@ where Standard: Distribution<T>
 
 use std::fmt;
 // 出力
-impl<T: fmt::Display + Default + std::cmp::PartialOrd + num_traits::Signed> fmt::Display for Complex<T> {
+impl<T: fmt::Display + Default + std::cmp::PartialOrd + num_traits::Signed> fmt::Display for Complexf64 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let sign = if self.imag < T::default() {
             "-"

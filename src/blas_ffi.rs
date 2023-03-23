@@ -1,6 +1,9 @@
 use std::{ptr, ffi::{c_float, c_int, c_void, c_char, CString}};
 
-use crate::{vmatrix::VMatrix, basic_trait::Transpose};
+use crate::{vmatrix::Matrix, basic_trait::Transpose};
+
+//use crate::Array;
+//use crate::basic_trait::Transpose;
 
 use openblas_src::*;
 use blas_sys::*;
@@ -15,14 +18,14 @@ pub fn sgemm() {
         let transb: *mut c_char = CString::new("N").unwrap().into_raw();
                 let alpha: c_float = 1.0;
         let beta: c_float = 0.0;
-        let mut a = VMatrix::ones(2, 2);
+        let mut a = Matrix::ones(2, 2);
         a[(0, 1)] = 10.0;
-        let b = VMatrix::ones(2, 2);
+        let b = Matrix::ones(2, 2);
         let m = a.rows as i32;
         let n = a.cols as i32;
         let k = b.cols as i32;
 
-        let mut c_v = VMatrix::zeros(2, 2);
+        let mut c_v = Matrix::zeros(2, 2);
 
         sgemm_(
             transa,

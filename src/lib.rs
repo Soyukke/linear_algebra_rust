@@ -6,7 +6,23 @@ pub mod matrix;
 pub mod vmatrix;
 pub mod basic_trait;
 
+
+pub mod array;
+#[cfg(feature="blas")]
+pub mod array_blas;
+#[cfg(feature="blas")]
+pub mod lapack_ffi;
+
 pub use crate::vmatrix::*;
+
+pub use crate::array::*;
+pub use crate::complex::*;
+
+#[cfg(feature="blas")]
+pub use crate::array_blas::*;
+#[cfg(feature="blas")]
+pub use crate::lapack_ffi::*;
+
 
 
 #[cfg(feature="blas")]
