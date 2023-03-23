@@ -162,6 +162,22 @@ impl<T: fmt::Display> fmt::Display for Array<T, 3> {
     }
 }
 
+impl<T: Add<Output = T> + AddAssign + Default + Copy> Add<Array<T, 1>> for Array<T, 1> {
+    type Output = Self;
+    fn add(self, other: Self) -> Self::Output {
+        let self_rows = self.dims[0];
+        let other_rows = other.dims[0];
+        if self_rows != other_rows {
+            panic!("matrix size does not match.");
+        }
+        let mut result = Self::zeros([self_rows]);
+        for i in 0..self_rows{
+            result[[i]] = self[[i]] + other[[i]];
+        }
+        result
+    }
+}
+
 impl<T: Add<Output = T> + AddAssign + Default + Copy> Add<Array<T, 2>> for Array<T, 2> {
     type Output = Self;
     fn add(self, other: Self) -> Self::Output {
