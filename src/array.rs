@@ -1,5 +1,5 @@
 use crate::basic_trait::{One, Transpose};
-use std::ops::{Mul, AddAssign};
+use std::ops::{Mul, Add, AddAssign};
 use rand::Rng;
 use rand::prelude::Distribution;
 use rand::distributions::Standard;
@@ -159,6 +159,24 @@ impl<T: fmt::Display> fmt::Display for Array<T, 3> {
             }
         }
         write!(f, "{}", s)
+    }
+}
+
+impl<T: Add<Output = T> + AddAssign + Default + Copy> Add<Array<T, 2>> for Array<T, 2> {
+    type Output = Self;
+    fn add(self, other: Self) -> Self::Output {
+        let (self_rows, self_cols) = (self.dims[0], self.dims[1]);
+        let (other_rows, other_cols) = (other.dims[0], other.dims[1]);
+        if self_rows != other_rows || self_cols != other_cols {
+            panic!("matrix size does not match.");
+        }
+        let mut result = Self::zeros([self_rows, other_cols]);
+        for i in 0..self_rows{
+            for j in 0..other_cols{
+                result[[i, j]] = self[[i, j]] + other[[i, j]];
+            }
+        }
+        result
     }
 }
 
