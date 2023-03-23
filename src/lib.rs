@@ -13,7 +13,7 @@ pub mod array_blas;
 #[cfg(feature="blas")]
 pub mod lapack_ffi;
 
-pub use crate::vmatrix::*;
+//pub use crate::vmatrix::*;
 
 pub use crate::array::*;
 pub use crate::complex::*;
