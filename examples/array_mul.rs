@@ -27,6 +27,15 @@ fn mul04() {
     println!("{}", A);
 }
 
+fn mul05() {
+    let A: Array<f64, 2> = Array::rand([5, 2]);
+    let B: Array<f64, 1> = Array::rand([2]);
+    println!("{}", A);
+    println!("{}", B);
+    println!("{}", A * B);
+}
+
+
 
 fn index_00() {
     let mut A: Array<f64, 3> = Array::ones([3; 3]);
@@ -45,5 +54,6 @@ fn main() {
     mul02();
     mul03();
     mul04();
+    mul05();
     index_00();
 }

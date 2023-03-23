@@ -180,6 +180,27 @@ impl<T: Add<Output = T> + AddAssign + Default + Copy> Add<Array<T, 2>> for Array
     }
 }
 
+impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<Array<T, 1>> for Array<T, 2> {
+    type Output = Array<T, 1>;
+    fn mul(self, other: Vector<T>) -> Self::Output {
+        let (self_rows, self_cols) = (self.dims[0], self.dims[1]);
+        let other_rows = other.dims[0];
+        if self_cols != other_rows {
+            panic!("matrix size does not match.");
+            //return Err(MatrixError::UndefinedError("matrix size does not match.".to_string()));
+        }
+        let mut result = Vector::<T>::zeros([self_rows]);
+        for i in 0..self_rows{
+            let mut x = T::default();
+            for k in 0..self_cols {
+                x += self[[i, k]] * other[[k]];
+            }
+            result[[i]] = x;
+        }
+        result
+    }
+}
+
 #[cfg(not(feature="blas"))]
 impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<Array<T, 2>> for Array<T, 2> {
     type Output = Self;
