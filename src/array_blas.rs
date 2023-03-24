@@ -2,10 +2,10 @@ use std::ops::{Mul, AddAssign};
 use openblas_src::*;
 use blas_sys::*;
 use std::{ptr, ffi::{c_float, c_int, c_void, c_char, CString}};
-use crate::array::Array;
+use crate::array::{Array, Matrix};
 
 
-impl Mul<Array<f32, 2>> for Array<f32, 2> {
+impl Mul<Matrix<f32>> for Matrix<f32> {
 
     type Output = Self;
     fn mul(self, other: Self) -> Self::Output {
@@ -19,7 +19,7 @@ impl Mul<Array<f32, 2>> for Array<f32, 2> {
         let n = self.dims[1] as i32;
         let k = other.dims[1] as i32;
 
-        let mut result: Array<f32, 2> = Array::zeros([m as usize, n as usize]);
+        let mut result: Matrix<f32> = Array::zeros([m as usize, n as usize]);
 
         unsafe {
             // https://netlib.org/lapack/explore-html/db/dc9/group__single__blas__level3_gafe51bacb54592ff5de056acabd83c260.html

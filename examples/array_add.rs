@@ -20,7 +20,37 @@ fn add02() {
     println!("{}", A + B);
 }
 
+
+fn sub00() {
+    let A = Vector::<f32>::rand([5]);
+    let B = Vector::<f32>::ones([5]);
+    println!("{}", A);
+    println!("{}", B);
+    println!("{}", A - B);
+}
+
+
+fn sub01() {
+    let A = Matrix::<f32>::rand([3, 3]);
+    let B = Matrix::<f32>::ones([3, 3]);
+    println!("{}", A);
+    println!("{}", B);
+    println!("{}", A - B);
+}
+
+
+fn sub02() {
+    let A = Matrix::<f32>::identity([3, 3]);
+    let B = Matrix::<f32>::ones([3, 3]);
+    println!("{}", A);
+    println!("{}", B);
+    println!("{}", A - B);
+}
+
 fn main() {
     add01();
     add02();
+    sub00();
+    sub01();
+    sub02();
 }

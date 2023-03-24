@@ -1,8 +1,12 @@
-use crate::basic_trait::{One, Transpose};
-use std::ops::{Mul, Add, AddAssign};
+use crate::basic_trait::{One};
+use crate::Complex;
+use std::ops::{Mul, Add, AddAssign, Sub, SubAssign};
 use rand::Rng;
 use rand::prelude::Distribution;
 use rand::distributions::Standard;
+use crate::basic_traits::scale::Scale;
+
+pub trait ArrayValue: Default+Clone+One+SubAssign+Default+Copy  {}
 
 #[derive(Debug, Clone)]
 pub struct Array<T, const D: usize> {
@@ -196,6 +200,113 @@ impl<T: Add<Output = T> + AddAssign + Default + Copy> Add<Array<T, 2>> for Array
     }
 }
 
+impl<T: Sub<Output = T> + SubAssign + Default + Copy> Sub<Array<T, 1>> for Array<T, 1> {
+    type Output = Self;
+    fn sub(self, other: Self) -> Self::Output {
+        let self_rows = self.dims[0];
+        let other_rows = other.dims[0];
+        if self_rows != other_rows {
+            panic!("matrix size does not match.");
+        }
+        let mut result = Self::zeros([self_rows]);
+        for i in 0..self_rows{
+            result[[i]] = self[[i]] - other[[i]];
+        }
+        result
+    }
+}
+
+
+impl<T: Sub<Output = T> + SubAssign + Default + Copy> Sub<Array<T, 2>> for Array<T, 2> {
+    type Output = Self;
+    fn sub(self, other: Self) -> Self::Output {
+        let (self_rows, self_cols) = (self.dims[0], self.dims[1]);
+        let (other_rows, other_cols) = (other.dims[0], other.dims[1]);
+        if self_rows != other_rows || self_cols != other_cols {
+            panic!("matrix size does not match.");
+        }
+        let mut result = Self::zeros([self_rows, other_cols]);
+        for i in 0..self_rows{
+            for j in 0..other_cols{
+                result[[i, j]] = self[[i, j]] - other[[i, j]];
+            }
+        }
+        result
+    }
+}
+
+
+
+/// スカラー乗算
+impl<T: Mul<Output = T> + AddAssign + Default + Copy, const D: usize> Mul<T> for Array<T, D> {
+    type Output = Array<T, D>;
+    fn mul(self, other: T) -> Self::Output {
+        self.scale(other)
+    }
+}
+
+impl<const D: usize> Mul<Array<f32, D>> for f32 {
+    type Output = Array<f32, D>;
+    fn mul(self, other: Array<f32, D>) -> Self::Output {
+        other.scale(self)
+    }
+}
+
+impl<const D: usize> Mul<Array<f64, D>> for f64 {
+    type Output = Array<f64, D>;
+    fn mul(self, other: Array<f64, D>) -> Self::Output {
+        other.scale(self)
+    }
+}
+
+impl<const D: usize> Mul<Array<i32, D>> for i32 {
+    type Output = Array<i32, D>;
+    fn mul(self, other: Array<i32, D>) -> Self::Output {
+        other.scale(self)
+    }
+}
+
+impl<const D: usize> Mul<Array<i64, D>> for i64 {
+    type Output = Array<i64, D>;
+    fn mul(self, other: Array<i64, D>) -> Self::Output {
+        other.scale(self)
+    }
+}
+
+impl<const D: usize> Mul<Array<Complex<f32>, D>> for Complex<f32> {
+    type Output = Array<Complex<f32>, D>;
+    fn mul(self, other: Array<Complex<f32>, D>) -> Self::Output {
+        other.scale(self)
+    }
+}
+
+impl<const D: usize> Mul<Array<Complex<f64>, D>> for Complex<f64> {
+    type Output = Array<Complex<f64>, D>;
+    fn mul(self, other: Array<Complex<f64>, D>) -> Self::Output {
+        other.scale(self)
+    }
+}
+
+impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<Matrix<T>> for Vector<T> {
+    type Output = Array<T, 2>;
+    fn mul(self, other: Matrix<T>) -> Self::Output {
+        // (N, 1) * (1, M) = (N, M)
+        let n = self.dims[0];
+        let (k, m) = (other.dims[0], other.dims[1]);
+        if k != 1 {
+            panic!("matrix size does not match.");
+            //return Err(MatrixError::UndefinedError("matrix size does not match.".to_string()));
+        }
+        let mut result = Matrix::<T>::zeros([n, m]);
+        for i in 0..n {
+            for j in 0..m {
+                result[[i, j]] = self[[i]] * other[[0, j]];
+            }
+        }
+        result
+    }
+}
+
 impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<Array<T, 1>> for Array<T, 2> {
     type Output = Array<T, 1>;
     fn mul(self, other: Vector<T>) -> Self::Output {
@@ -241,39 +352,3 @@ impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<Array<T, 2>> for Array
     }
 }
 
-
-
-/// 転置
-impl<T: Default + Copy> Transpose for Array<T, 2> {
-    type Output = Array<T, 2>;
-    fn transpose(self) -> Self::Output {
-        let mut result = Array::<T, 2>::zeros([self.dims[1], self.dims[0]]);
-        for i in 0..self.dims[0] {
-            for j in 0..self.dims[1] {
-                result[[j, i]] = self[[i, j]];
-            }
-        }
-        result
-    }
-}
-
-//impl<T: Mul<Output = T> + AddAssign + Default + Copy, const D: usize> Mul<Array<T, D>> for Array<T, D> {
-//    type Output = Self;
-//    fn mul(self, other: Self) -> Self::Output {
-//        if self.cols != other.rows {
-//            panic!("matrix size does not match.");
-//            //return Err(MatrixError::UndefinedError("matrix size does not match.".to_string()));
-//        }
-//        let mut result = Self::zeros(self.rows, other.cols);
-//        for i in 0..self.rows{
-//            for j in 0..other.cols{
-//                let mut x = T::default();
-//                for k in 0..other.rows{
-//                    x += self[(i, k)] * other[(k, j)]
-//                }
-//                result[(i, j)] = x;
-//            }
-//        }
-//        result
-//    }
-//}

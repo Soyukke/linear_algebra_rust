@@ -1,6 +1,9 @@
 #![allow(non_snake_case)]
 
-use linear_algebra::Array;
+// $ cargo run --example array_mul
+//
+use linear_algebra::{Array, Matrix, Vector, Transpose};
+use linear_algebra::Complex;
 
 fn mul01() {
     let A = Array::new([3; 2], 2.0);
@@ -35,7 +38,31 @@ fn mul05() {
     println!("{}", A * B);
 }
 
+fn mul06() {
+    let A: Array<f64, 2> = Array::ones([3, 3]);
+    let b = 4.0;
+    println!("{}", A);
+    println!("{}", b);
+    println!("{}", A.clone() * b);
+    println!("{}", b * A.clone());
+}
 
+fn mul07() {
+    let A: Array<Complex<f64>, 2> = Array::rand([3, 3]);
+    let b = Complex {real: 3.0, imag: 0.0};
+    println!("{}", A);
+    println!("{}", b);
+    println!("{}", A.clone() * b);
+    println!("{}", b * A.clone());
+}
+
+fn mul08() {
+    let a: Vector<f64> = Array::rand([3]);
+    let b: Vector<f64> = Array::rand([3]);
+    println!("{}", a);
+    println!("{}", b.clone().transpose());
+    println!("{}", a * b.transpose());
+}
 
 fn index_00() {
     let mut A: Array<f64, 3> = Array::ones([3; 3]);
@@ -55,5 +82,8 @@ fn main() {
     mul03();
     mul04();
     mul05();
+    mul06();
+    mul07();
+    mul08();
     index_00();
 }

@@ -1,9 +1,6 @@
 use std::{ptr, ffi::{c_float, c_int, c_void, c_char, CString}};
 
-use crate::{vmatrix::Matrix, basic_trait::Transpose};
-
-//use crate::Array;
-//use crate::basic_trait::Transpose;
+use crate::{Array, Vector, Matrix, Transpose};
 
 use openblas_src::*;
 use blas_sys::*;
