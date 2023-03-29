@@ -7,6 +7,10 @@ pub mod basic_traits;
 
 pub use basic_traits::*;
 
+pub mod operators;
+pub use operators::*;
+
+
 pub mod array;
 #[cfg(feature="blas")]
 pub mod array_blas;

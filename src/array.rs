@@ -166,74 +166,21 @@ impl<T: fmt::Display> fmt::Display for Array<T, 3> {
     }
 }
 
-impl<T: Add<Output = T> + AddAssign + Default + Copy> Add<Array<T, 1>> for Array<T, 1> {
-    type Output = Self;
-    fn add(self, other: Self) -> Self::Output {
-        let self_rows = self.dims[0];
-        let other_rows = other.dims[0];
-        if self_rows != other_rows {
-            panic!("matrix size does not match.");
-        }
-        let mut result = Self::zeros([self_rows]);
-        for i in 0..self_rows{
-            result[[i]] = self[[i]] + other[[i]];
-        }
-        result
-    }
-}
-
-impl<T: Add<Output = T> + AddAssign + Default + Copy> Add<Array<T, 2>> for Array<T, 2> {
-    type Output = Self;
-    fn add(self, other: Self) -> Self::Output {
-        let (self_rows, self_cols) = (self.dims[0], self.dims[1]);
-        let (other_rows, other_cols) = (other.dims[0], other.dims[1]);
-        if self_rows != other_rows || self_cols != other_cols {
-            panic!("matrix size does not match.");
-        }
-        let mut result = Self::zeros([self_rows, other_cols]);
-        for i in 0..self_rows{
-            for j in 0..other_cols{
-                result[[i, j]] = self[[i, j]] + other[[i, j]];
-            }
-        }
-        result
-    }
-}
-
-impl<T: Sub<Output = T> + SubAssign + Default + Copy> Sub<Array<T, 1>> for Array<T, 1> {
-    type Output = Self;
-    fn sub(self, other: Self) -> Self::Output {
-        let self_rows = self.dims[0];
-        let other_rows = other.dims[0];
-        if self_rows != other_rows {
-            panic!("matrix size does not match.");
-        }
-        let mut result = Self::zeros([self_rows]);
-        for i in 0..self_rows{
-            result[[i]] = self[[i]] - other[[i]];
-        }
-        result
-    }
-}
-
-
-impl<T: Sub<Output = T> + SubAssign + Default + Copy> Sub<Array<T, 2>> for Array<T, 2> {
-    type Output = Self;
-    fn sub(self, other: Self) -> Self::Output {
-        let (self_rows, self_cols) = (self.dims[0], self.dims[1]);
-        let (other_rows, other_cols) = (other.dims[0], other.dims[1]);
-        if self_rows != other_rows || self_cols != other_cols {
-            panic!("matrix size does not match.");
-        }
-        let mut result = Self::zeros([self_rows, other_cols]);
-        for i in 0..self_rows{
-            for j in 0..other_cols{
-                result[[i, j]] = self[[i, j]] - other[[i, j]];
-            }
-        }
-        result
-    }
-}
+//impl<T: Add<Output = T> + AddAssign + Default + Copy> Add<Array<T, 1>> for Array<T, 1> {
+//    type Output = Self;
+//    fn add(self, other: Self) -> Self::Output {
+//        let self_rows = self.dims[0];
+//        let other_rows = other.dims[0];
+//        if self_rows != other_rows {
+//            panic!("matrix size does not match.");
+//        }
+//        let mut result = Self::zeros([self_rows]);
+//        for i in 0..self_rows{
+//            result[[i]] = self[[i]] + other[[i]];
+//        }
+//        result
+//    }
+//}
 
 
 
@@ -307,48 +254,27 @@ impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<Matrix<T>> for Vector<
     }
 }
 
-impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<Array<T, 1>> for Array<T, 2> {
-    type Output = Array<T, 1>;
-    fn mul(self, other: Vector<T>) -> Self::Output {
-        let (self_rows, self_cols) = (self.dims[0], self.dims[1]);
-        let other_rows = other.dims[0];
-        if self_cols != other_rows {
-            panic!("matrix size does not match.");
-            //return Err(MatrixError::UndefinedError("matrix size does not match.".to_string()));
-        }
-        let mut result = Vector::<T>::zeros([self_rows]);
-        for i in 0..self_rows{
-            let mut x = T::default();
-            for k in 0..self_cols {
-                x += self[[i, k]] * other[[k]];
-            }
-            result[[i]] = x;
-        }
-        result
-    }
-}
-
-#[cfg(not(feature="blas"))]
-impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<Array<T, 2>> for Array<T, 2> {
-    type Output = Self;
-    fn mul(self, other: Self) -> Self::Output {
-        let (self_rows, self_cols) = (self.dims[0], self.dims[1]);
-        let (other_rows, other_cols) = (other.dims[0], other.dims[1]);
-        if self_cols != other_rows {
-            panic!("matrix size does not match.");
-            //return Err(MatrixError::UndefinedError("matrix size does not match.".to_string()));
-        }
-        let mut result = Self::zeros([self_rows, other_cols]);
-        for i in 0..self_rows{
-            for j in 0..other_cols{
-                let mut x = T::default();
-                for k in 0..other_rows{
-                    x += self[[i, k]] * other[[k, j]]
-                }
-                result[[i, j]] = x;
-            }
-        }
-        result
-    }
-}
+//#[cfg(not(feature="blas"))]
+//impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<Array<T, 2>> for Array<T, 2> {
+//    type Output = Self;
+//    fn mul(self, other: Self) -> Self::Output {
+//        let (self_rows, self_cols) = (self.dims[0], self.dims[1]);
+//        let (other_rows, other_cols) = (other.dims[0], other.dims[1]);
+//        if self_cols != other_rows {
+//            panic!("matrix size does not match.");
+//            //return Err(MatrixError::UndefinedError("matrix size does not match.".to_string()));
+//        }
+//        let mut result = Self::zeros([self_rows, other_cols]);
+//        for i in 0..self_rows{
+//            for j in 0..other_cols{
+//                let mut x = T::default();
+//                for k in 0..other_rows{
+//                    x += self[[i, k]] * other[[k, j]]
+//                }
+//                result[[i, j]] = x;
+//            }
+//        }
+//        result
+//    }
+//}
 
