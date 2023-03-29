@@ -1,12 +1,14 @@
 use crate::basic_trait::{One};
 use crate::Complex;
-use std::ops::{Mul, Add, AddAssign, Sub, SubAssign};
+use std::ops::{Mul, Div, Add, AddAssign, Sub, SubAssign};
 use rand::Rng;
 use rand::prelude::Distribution;
 use rand::distributions::Standard;
 use crate::basic_traits::scale::Scale;
 
-pub trait ArrayValue: Default+Clone+One+SubAssign+Default+Copy  {}
+pub trait ArrayValue<T>: Default + Clone + One + Copy + Sub<Output = T> + Add<Output = T> + Mul<Output = T> + AddAssign {}
+pub trait ArrayValue2<T>: Default + Copy + std::ops::Mul<Output = T> + std::ops::AddAssign<T> {}
+
 
 #[derive(Debug, Clone)]
 pub struct Array<T, const D: usize> {
@@ -82,8 +84,9 @@ impl<T, const D: usize> std::ops::Index<([usize; D])> for Array<T, D> {
 }
 
 // Row-Major like Z
-impl<T, const D: usize> std::ops::IndexMut<[usize; D]> for Array<T, D> {
+impl<T , const D: usize> std::ops::IndexMut<[usize; D]> for Array<T, D> {
     fn index_mut(&mut self, dims: [usize; D]) -> &mut Self::Output {
+        //println!("data: {:?}", self.data);
         let n = dims.len();
         let mut idx = 0;
         let mut stride = 1;
@@ -182,6 +185,16 @@ impl<T: fmt::Display> fmt::Display for Array<T, 3> {
 //    }
 //}
 
+impl<T: Default + Clone + Copy + Sub<Output=T>, const D: usize> Sub<T> for Array<T, D> {
+    type Output = Self;
+    fn sub(self, other: T) -> Self::Output {
+        let mut result = Self::zeros(self.dims);
+        for i in 0..result.data.len() {
+            result.data[i] = self.data[i] - other;
+        }
+        result
+    }
+}
 
 
 /// スカラー乗算
@@ -189,6 +202,15 @@ impl<T: Mul<Output = T> + AddAssign + Default + Copy, const D: usize> Mul<T> for
     type Output = Array<T, D>;
     fn mul(self, other: T) -> Self::Output {
         self.scale(other)
+    }
+}
+
+
+/// スカラー乗算
+impl<T: Mul<Output = T> + Div<Output = T> + AddAssign + Default + Copy + One, const D: usize> Div<T> for Array<T, D> {
+    type Output = Array<T, D>;
+    fn div(self, other: T) -> Self::Output {
+        self.scale(T::one()/other)
     }
 }
 
@@ -203,6 +225,21 @@ impl<const D: usize> Mul<Array<f64, D>> for f64 {
     type Output = Array<f64, D>;
     fn mul(self, other: Array<f64, D>) -> Self::Output {
         other.scale(self)
+    }
+}
+
+impl<const D: usize> Div<Array<f64, D>> for f64 {
+    type Output = Array<f64, D>;
+    fn div(self, other: Array<f64, D>) -> Self::Output {
+        other.scale(1f64/self)
+    }
+}
+
+
+impl<const D: usize> Div<Array<f32, D>> for f32 {
+    type Output = Array<f32, D>;
+    fn div(self, other: Array<f32, D>) -> Self::Output {
+        other.scale(1f32/self)
     }
 }
 
@@ -278,3 +315,34 @@ impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<Matrix<T>> for Vector<
 //    }
 //}
 
+
+/// dot product for vector 
+impl<T> Vector<T>
+//where T: ArrayValue2<T>
+where T: Default + Mul<Output = T> + AddAssign + Copy 
+{
+    pub fn dot(&self, b: &Vector<T>) -> T {
+        let mut z = T::default();
+        let n = self.dims[0];
+        for i in 0..n {
+            z += self[[i]] * b[[i]]
+        }
+        z
+    }
+}
+
+impl<T> Matrix<T> 
+//where T: ArrayValue2<T>
+where T: Default + Mul<Output = T> + AddAssign + Copy 
+{
+    pub fn dot(&self, b: &Matrix<T>) -> T {
+        let mut z = T::default();
+        let (n, m) = (self.dims[0], self.dims[1]);
+        for i in 0..n {
+            for j in 0..m {
+                z += self[[i, j]] * b[[i, j]]
+            }
+        }
+        z
+    }
+}

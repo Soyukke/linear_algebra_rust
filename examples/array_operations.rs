@@ -1,5 +1,8 @@
 use linear_algebra::{Array, Matrix, Vector};
 
+
+// $ cargo run --example array_operations
+
 fn v_norm() {
     let v = Vector::<f32>::ones([5]);
     let l1 = v.l1_norm();

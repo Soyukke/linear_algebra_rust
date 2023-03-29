@@ -3,7 +3,7 @@
 // $ cargo run --example array_lapack --features=blas
 
 use linear_algebra::Array;
-use linear_algebra::Eigen;
+use linear_algebra::lapack_ffi::*;
 
 
 fn mul01() {
@@ -37,10 +37,19 @@ fn eigen01() {
     println!("values: {}", result.values);
 }
 
+
+fn qr01() {
+    let mut A: Array<f64, 2>  = Array::rand([3; 2]);
+    println!("A: {}", A);
+    //let result = qr_decomposition(A);
+    //println!("values: {}", result);
+}
+
 fn main() {
     mul01();
     mul02();
     mul03();
     eigen01();
+    qr01();
 }
 
