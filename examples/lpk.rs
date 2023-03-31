@@ -7,6 +7,14 @@ fn qr() {
     println!("{}", r);
 }
 
+fn lu() {
+    let x = Matrix::<f64>::rand([5, 5]);
+    let (l, u) = x.lu_decomposition();
+    println!("{}", l);
+    println!("{}", u);
+}
+
 fn main() {
-    qr();
+    //qr();
+    lu();
 }

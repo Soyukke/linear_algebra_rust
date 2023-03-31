@@ -186,4 +186,35 @@ where {
 
         (q, r)
     }
+
+    pub fn lu_decomposition(&self) -> (Matrix<f64>, Matrix<f64>) {
+        //if self.dims[0] < self.dims[1] {
+        //    return None;
+        //}
+
+        //let mut q = Matrix::identity([self.dims[0], self.dims[0]]);
+        let mut lu = self.clone();
+
+        let mut ipvt = vec![0; self.dims[1]];
+
+        let mut info = 0;
+
+        let (n, m) = (self.dims[0] as i32, self.dims[1] as i32);
+        unsafe {
+
+            dgbtrf_(
+                &n,
+                &m,
+                &n,
+                &m,
+                lu.data.as_mut_ptr(),
+                &n,
+                ipvt.as_mut_ptr(),
+                &mut info,
+            );
+
+        }
+
+        (lu.clone(), lu)
+    }
 }
