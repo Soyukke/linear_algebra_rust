@@ -48,31 +48,20 @@ values: 3 Array
 ### Example CUDA
 
 ```rust
-use crate::cublas_ffi::*;
-let x = VMatrix::<f32>::new(3, 3, 2f32);
-let y = VMatrix::<f32>::new(3, 3, 3f32);
-println!("cpu::x: {}", x);
-println!("cpu::x: {}", y);
+use linear_algebra::{Complex, Matrix, Vector};
+use linear_algebra::{CPU,GPU};
+let n = 3;
+let x = Matrix::<f32>::rand([n, n]);
+let y = Matrix::<f32>::rand([n, n]);
 let cx = x.gpu();
 let cy = y.gpu();
 let cz = cx * cy;
-let cpuz = cz.unwrap().cpu();
-println!("cpu::z: {}", cpuz);
+let z = cz.unwrap().cpu();
+println!("z: {}", z);
 
 => Result
-cpu::x: 3x3 Matrix
-    2     2     2 
-    2     2     2 
-    2     2     2 
-
-cpu::x: 3x3 Matrix
-    3     3     3 
-    3     3     3 
-    3     3     3 
-
-cpu::z: 3x3 Matrix
-   18    18    18 
-   18    18    18 
-   18    18    18 
-
+z: 3x3 Array
+ 1.03856  0.81080  0.78834 
+ 1.12424  1.01148  0.45698 
+ 1.52945  1.29110  0.96300 
 ```

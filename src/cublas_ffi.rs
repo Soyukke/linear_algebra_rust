@@ -5,7 +5,7 @@ use std::{
     ptr,
 };
 //use crate::matrix::{Matrix};
-use crate::vmatrix::*;
+use crate::Matrix;
 use crate::basic_trait::One;
 use std::mem::size_of;
 use std::ops::{Add, Mul, AddAssign, Index, IndexMut};
@@ -71,15 +71,15 @@ pub struct CuMatrix {
 }
 
 impl Mul<CuMatrix> for CuMatrix {
-    type Output = Result<Self, MatrixError>;
+    type Output = Result<Self, CuMatrixError>;
 
     fn mul(self, other: Self) -> Self::Output {
         if self.cols != other.rows {
-            return Err(MatrixError::UndefinedError("matrix size does not match.".to_string()));
+            return Err(CuMatrixError::UndefinedError("matrix size does not match.".to_string()));
         }
 
         let handle = CublasHandle::new().unwrap();
-        let mut mat = Matrix::<f32>::zeros(self.rows, other.cols);
+        let mut mat = Matrix::<f32>::zeros([self.rows, other.cols]);
         let mut result = mat.gpu();
 
         let m = self.rows;
@@ -125,10 +125,11 @@ pub trait GPU {
 impl GPU for Matrix<f32> {
     type Output = CuMatrix;
     fn gpu(&self) -> Self::Output {
-        let n = self.rows*self.cols*size_of::<c_float>();
+        let (rows, cols) = (self.dims[0], self.dims[1]);
+        let n = rows*cols*size_of::<c_float>();
         let mut a_ptr: *mut f32 = malloc(n).unwrap();
         memcpy_to_device(a_ptr, self.data.as_ptr(), n).unwrap();
-        CuMatrix { rows: self.rows, cols: self.cols, data_ptr: a_ptr }
+        CuMatrix { rows: rows, cols: cols, data_ptr: a_ptr }
     }
 }
 
@@ -143,7 +144,7 @@ impl CPU for CuMatrix {
         let mut data = vec![0.0f32; self.rows*self.cols];
         let n = self.rows*self.cols*size_of::<c_float>();
         memcpy_to_host(data.as_mut_ptr(), self.data_ptr, n).unwrap();
-        Matrix { rows: self.rows, cols: self.cols, data: data}
+        Matrix { dims: [self.rows, self.cols], data: data}
     }
 }
 

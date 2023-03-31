@@ -1,6 +1,6 @@
 use crate::complex::*;
 use crate::cuda_ffi::{free, malloc, memcpy_to_device, memcpy_to_host, CUDAError};
-use crate::vmatrix::*;
+use crate::Matrix;
 use crate::cublas_ffi::{GPU, CPU};
 use cusolver_sys::*;
 use std::{
@@ -57,14 +57,14 @@ pub fn cusolverDnCheevd_ffi() {
     //
     //
     let n = 3;
-    let mut A = Matrix::<Complex<f32>>::rand(n, n);
+    let mut A = Matrix::<Complex<f32>>::rand([n, n]);
     let mut W = vec![0f32; n as usize];
-    let mut work = Matrix::<Complex<f32>>::zeros(n * n, 1);
+    let mut work = Matrix::<Complex<f32>>::zeros([n * n, 1]);
     let mut lwork = (n * n) as c_int;
     let mut info = vec![0 as c_int; 1];
     println!("A: {}", A);
-    let mut a_vec = A.to_vec();
-    let mut work_vec = work.to_vec();
+    let mut a_vec = A.data;
+    let mut work_vec = work.clone().data;
 
     let n_mem1 = n * n * size_of::<float2>();
     let n_mem2 = n * size_of::<c_float>();
@@ -337,16 +337,16 @@ pub fn sgemm_test() {
 
         let rows = 3;
         let cols = 3;
-        let mut S = Matrix::<f32>::new(rows, cols, 3.0);
-        let mut R = Matrix::<f32>::new(rows, cols, 5.0);
+        let mut S = Matrix::<f32>::new([rows, cols], 3.0);
+        let mut R = Matrix::<f32>::new([rows, cols], 5.0);
         let mut Sg = S.gpu();
         let mut Rg = R.gpu();
-        let mut mat = Matrix::<f32>::zeros(S.rows, R.cols);
+        let mut mat = Matrix::<f32>::zeros([S.dims[0], R.dims[1]]);
         let mut result = mat.gpu();
 
-        let m = S.rows;
-        let n = R.cols;
-        let k = S.cols; // = other.rows
+        let m = S.dims[0];
+        let n = R.dims[1];
+        let k = S.dims[1]; // = other.rows
 
         let alpha: c_float= 1.0;
         let beta: c_float= 0.0;
