@@ -16,7 +16,8 @@ fn lu01() {
 }
 
 fn lu02() {
-    let a = Matrix::<f64>::rand([10, 10]);
+    let n = 200;
+    let a = Matrix::<f64>::rand([n, n]);
     println!("initialize ok");
     let (l, u) = a.lu();
     println!("a - l*u {}", a - l*u);

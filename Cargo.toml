@@ -30,3 +30,5 @@ cusolver-sys = { path = "cusolver-sys", optional=true }
 # https://docs.rs/lapack-src/0.8.0/lapack_src/
 lapack-src = {version="0.8.0", features = ["openblas"], optional=true}
 lapack-sys = {version="0.14.0",optional=true}
+rayon = "1.7.0"
+itertools = "0.10.5"

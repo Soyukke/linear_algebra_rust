@@ -62,6 +62,7 @@ impl<'a, T: Mul<Output = T> + AddAssign + Default + Copy> Mul<Matrix<T>> for &'a
     }
 }
 
+#[cfg(not(feature="blas"))]
 impl<T: Mul<Output = T> + AddAssign + Default + Copy> Mul<Matrix<T>> for Matrix<T> {
     type Output = Matrix<T>;
     fn mul(self, other: Matrix<T>) -> Self::Output {

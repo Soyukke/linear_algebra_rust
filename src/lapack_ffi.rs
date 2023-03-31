@@ -100,93 +100,90 @@ impl Eigen for Array<f64, 2> {
 }
 
 
-//impl Matrix<f64>
-//where {
-//    pub fn qr_decomposition(&self) -> Option<(Matrix<f64>, Matrix<f64>)> {
-//        if self.dims[0] < self.dims[1] {
-//            return None;
-//        }
-//
-//        let mut q = Matrix::identity([self.dims[0], self.dims[0]]);
-//        let mut r = self.clone();
-//
-//        let mut jpvt = vec![0; self.dims[1]];
-//        let mut tau = vec![f64::zero(); min(self.dims[0], self.dims[1])];
-//
-//        let mut work_size = -1;
-//        let mut info = 0;
-//
-//        unsafe {
-//            // calculate work size
-//            let mut work = vec![f64::zero(); 1];
-//            dgeqp3_(
-//                self.dims[0] as i32,
-//                self.dims[1] as i32,
-//                r.as_slice(),
-//                self.dims[0] as i32,
-//                jpvt.as_mut_ptr(),
-//                tau.as_mut_ptr(),
-//                work.as_mut_ptr(),
-//                &mut work_size,
-//                &mut info,
-//            );
-//
-//            work = vec![f64::zero(); work_size as usize];
-//            // QR decomposition with column pivoting
-//            dgeqp3_(
-//                self.dims[0] as i32,
-//                self.dims[1] as i32,
-//                r.as_mut_slice().unwrap(),
-//                self.dims[0] as i32,
-//                jpvt.as_mut_ptr(),
-//                tau.as_mut_ptr(),
-//                work.as_mut_ptr(),
-//                work_size,
-//                &mut info,
-//            );
-//
-//            // calculate Q from the result of QR decomposition
-//            let lwork = -1;
-//            let mut q_size = 0;
-//            dorgqr_(
-//                self.dims[0] as i32,
-//                self.dims[0] as i32,
-//                min(self.dims[0], self.dims[1]) as i32,
-//                r.data.as_mut_ptr(),
-//                self.dims[0] as i32,
-//                tau.as_slice().unwrap(),
-//                work.as_mut_ptr(),
-//                &lwork,
-//                &mut info,
-//            );
-//            q_size = work[0] as usize;
-//            work_size = q_size as i32;
-//
-//            let mut q_data = vec![f64::zero(); q_size];
-//            dorgqr_(
-//                self.dims[0] as i32,
-//                self.dims[0] as i32,
-//                min(self.dims[0], self.dims[1]) as i32,
-//                r.as_slice().unwrap(),
-//                self.dims[0] as i32,
-//                tau.as_slice().unwrap(),
-//                q_data.as_mut_ptr(),
-//                q_size as i32,
-//                work.as_mut_ptr(),
-//                work_size,
-//                &mut info,
-//            );
-//
-//            let q_slice = q.as_slice_mut().unwrap().slice_mut(s![.., ..q_size]);
-//            let q_data_slice = q_data.as_slice();
-//            q_slice.assign(
-//                &ArrayBase::from_shape_vec((self.dims[0], q_size), q_data_slice.to_vec()).unwrap(),
-//            );
-//
-//            let r_slice = r.as_slice_mut().unwrap().slice_mut(s![..q_size, ..]);
-//            r_slice.triu_mut(0);
-//        }
-//
-//        Some((q, r))
-//    }
-//}
+impl Matrix<f64>
+where {
+    pub fn qr_decomposition(&self) -> (Matrix<f64>, Matrix<f64>) {
+        //if self.dims[0] < self.dims[1] {
+        //    return None;
+        //}
+
+        let mut q = Matrix::identity([self.dims[0], self.dims[0]]);
+        let mut r = self.clone();
+
+        let mut jpvt = vec![0; self.dims[1]];
+        let mut tau = vec![0f64; min(self.dims[0], self.dims[1])];
+
+        let mut work_size = -1;
+        let mut info = 0;
+
+        let (n, m) = (self.dims[0] as i32, self.dims[1] as i32);
+        unsafe {
+            // calculate work size
+            let mut work = vec![0f64; 1];
+            //dgeqp3_(
+            //    &n,
+            //    &m,
+            //    r.data.as_mut_ptr(),
+            //    &n,
+            //    jpvt.as_mut_ptr(),
+            //    tau.as_mut_ptr(),
+            //    work.as_mut_ptr(),
+            //    &mut work_size,
+            //    &mut info,
+            //);
+
+            //work = vec![0f64; work_size as usize];
+            //// QR decomposition with column pivoting
+            //dgeqp3_(
+            //    &n,
+            //    &m,
+            //    r.data.as_mut_ptr(),
+            //    &n,
+            //    jpvt.as_mut_ptr(),
+            //    tau.as_mut_ptr(),
+            //    work.as_mut_ptr(),
+            //    &work_size,
+            //    &mut info,
+            //);
+
+            // calculate Q from the result of QR decomposition
+            let lwork = -1;
+            dgeqrf_(
+                &n,
+                &m,
+                r.data.as_mut_ptr(),
+                &n,
+                tau.as_mut_ptr(),
+                work.as_mut_ptr(),
+                &lwork,
+                &mut info,
+            );
+            //q_size = work[0] as usize;
+            //work_size = q_size as i32;
+
+            //let mut q_data = vec![0f64; q_size];
+            let mut work = vec![0f64; work[0] as usize];
+            dgeqrf_(
+                &n,
+                &m,
+                r.data.as_mut_ptr(),
+                &n,
+                tau.as_mut_ptr(),
+                work.as_mut_ptr(),
+                &lwork,
+                &mut info,
+            );
+
+            //let q_slice = q.as_slice_mut().unwrap().slice_mut(s![.., ..q_size]);
+            //let q_data_slice = q_data.as_slice();
+            //q_slice.assign(
+            //    &ArrayBase::from_shape_vec((self.dims[0], q_size), q_data_slice.to_vec()).unwrap(),
+            //);
+
+            //let r_slice = r.as_slice_mut().unwrap().slice_mut(s![..q_size, ..]);
+            //r_slice.triu_mut(0);
+        }
+
+        (q, r)
+    }
+}

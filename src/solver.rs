@@ -166,6 +166,7 @@ impl<T: Real + MulAssign + AddAssign + Default + Clone + One + Sub<Output=T> + M
     /// A = QR
     /// R: 上三角行列
     /// Q
+    #[cfg(not(feature="blas"))]
     pub fn qr(&self) -> (Matrix<T>, Matrix<T>) {
         let (n, m) = (self.dims[0], self.dims[1]);
         //let mut q = Matrix::<T> {dims: [n, n], data: vec![T::default(); n * n]};
