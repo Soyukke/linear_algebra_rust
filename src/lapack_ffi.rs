@@ -1,6 +1,7 @@
 use crate::array::{Array, Vector, Matrix};
 use crate::complex::Complex;
-use crate::basic_trait::One;
+use crate::One;
+use crate::basic_traits::transpose::Transpose;
 
 use blas_sys::*;
 use lapack_src::*;
@@ -187,34 +188,29 @@ where {
         (q, r)
     }
 
-    pub fn lu_decomposition(&self) -> (Matrix<f64>, Matrix<f64>) {
-        //if self.dims[0] < self.dims[1] {
-        //    return None;
-        //}
-
-        //let mut q = Matrix::identity([self.dims[0], self.dims[0]]);
-        let mut lu = self.clone();
-
-        let mut ipvt = vec![0; self.dims[1]];
-
+    pub fn lu_decomposition(&self) -> (Matrix<f64>, Matrix<f64>, Matrix<f64>) {
+        // FIXME: ROW-MajorをColumn-Majorにするためにtransposeしているがメモリ確保して無駄なので直したい
+        let mut lu = self.clone().transpose();
+        let mut ipvt = Vector::<i32>::zeros([self.dims[0]]);
         let mut info = 0;
-
         let (n, m) = (self.dims[0] as i32, self.dims[1] as i32);
         unsafe {
-
-            dgbtrf_(
-                &n,
-                &m,
+            //dgbtrf_(
+            dgetrf_(
                 &n,
                 &m,
                 lu.data.as_mut_ptr(),
                 &n,
-                ipvt.as_mut_ptr(),
+                ipvt.data.as_mut_ptr(),
                 &mut info,
             );
-
         }
+        let mut lu = lu.transpose();
+        let mut ipvt2 = (ipvt - 1).data;
+        let p = Matrix::mutation_matrix(ipvt2);
+        let u = Matrix::upper_triangular(&lu);
+        let l = Matrix::lower_triangular(&lu);
 
-        (lu.clone(), lu)
+        (p, l, u)
     }
 }

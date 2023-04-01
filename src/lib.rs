@@ -47,7 +47,7 @@ pub mod gpu;
 mod tests {
 
     use crate::complex::Complex;
-    use crate::basic_trait::{One, Transpose};
+    use crate::{One, Transpose};
     use rand::Rng;
     use rand::distributions::{Distribution, Standard};
 

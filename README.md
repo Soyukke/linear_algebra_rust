@@ -9,7 +9,7 @@ See test functions in src/lib.rs.
 ```
 => Rust Code
 use crate::matrix::{*};
-use crate::basic_trait::One;
+use crate::One;
 
 let n = Matrix::<f64, 3, 3>::one();
 println!("{}", n);

@@ -1,5 +1,5 @@
 use std::ops::{Add, Sub, Mul, AddAssign, Neg};
-use crate::basic_trait::One;
+use crate::One;
 use rand::Rng;
 use rand::distributions::{Distribution, Standard};
 

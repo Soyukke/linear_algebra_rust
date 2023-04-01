@@ -1,7 +1,7 @@
 use std::ops::{Add, Mul, AddAssign, Index, IndexMut};
 // クレート内のモジュールへのアクセスはcrate::で行う。
 use crate::vector::*;
-use crate::basic_trait::{One, Transpose};
+use crate::One, Transpose};
 
 use rand::Rng;
 use rand::distributions::{Distribution, Standard};

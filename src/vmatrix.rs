@@ -1,6 +1,6 @@
 use std::ops::{Mul, AddAssign};
 // クレート内のモジュールへのアクセスはcrate::で行う。
-use crate::basic_trait::{One, Transpose};
+use crate::One, Transpose};
 
 use rand::Rng;
 use rand::distributions::{Distribution, Standard};

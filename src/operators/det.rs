@@ -1,5 +1,5 @@
 use crate::{Matrix, Vector};
-use crate::basic_trait::One;
+use crate::One;
 use std::ops::{AddAssign,Mul,Add, Sub, SubAssign, Div};
 use rayon::prelude::*;
 use itertools::iproduct;

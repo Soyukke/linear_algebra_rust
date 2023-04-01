@@ -6,7 +6,7 @@ use std::{
 };
 //use crate::matrix::{Matrix};
 use crate::Matrix;
-use crate::basic_trait::One;
+use crate::One;
 use std::mem::size_of;
 use std::ops::{Add, Mul, AddAssign, Index, IndexMut};
 

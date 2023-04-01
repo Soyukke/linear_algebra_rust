@@ -1,7 +1,7 @@
 use std::{ops::{MulAssign, AddAssign, Mul, Range, Sub, SubAssign}, iter::Chain};
 use num_traits::real::Real;
 
-use crate::{Matrix, Vector, ArrayValue, Transpose, basic_trait::One};
+use crate::{Matrix, Vector, ArrayValue, Transpose, One};
 
 #[derive(Debug, Clone)]
 pub struct MatrixView<T, S>
@@ -103,8 +103,36 @@ impl<T: Default + Copy + Clone> Matrix<T> {
         m
     }
 
+    pub fn upper_triangular(m: &Matrix<T>) -> Matrix<T> {
+        let mut u = Matrix::<T>::zeros(m.dims);
+        for i in 0..m.dims[0] {
+            for j in i..m.dims[1] {
+                u[[i, j]] = m[[i, j]];
+            }
+        }
+        u
+    }
+
+    
+    
+
 
 }
+
+impl<T: Default + Copy + Clone + One> Matrix<T> {
+
+    pub fn lower_triangular(m: &Matrix<T>) -> Matrix<T> {
+        let mut l = Matrix::<T>::identity(m.dims);
+        for j in 0..m.dims[0] {
+            for i in j+1..m.dims[1] {
+                l[[i, j]] = m[[i, j]];
+            }
+        }
+        l
+    }
+
+}
+
 
 
 impl<T: Default + Copy + MulAssign + AddAssign + PartialOrd + Mul<Output=T> + Real> Vector<T> {
